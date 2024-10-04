@@ -7,45 +7,46 @@ import (
 
 var db *gorm.DB
 
-// Book represents a book entity in the library
 type Book struct {
 	gorm.Model
-	Name           string `json:"name"`
-	ISBN           string `json:"isbn"`
-	Publication    string `json:"publication"`
-	NumberOfCopies int    `json:"number_of_copies"`
-	AuthorID       uint   `json:"author_id"` // Foreign key for author
+	Title       string                `json:"title"`
+	Year        int                   `json:"year"`
+	AuthorID    uint                  `json:"author_id"`
+	ISBN        string                `json:"isbn"`
+	Publication string                `json:"publication"`
+	NumOfCopies int                   `json:"num_of_copies"`
+	Author      Author                `gorm:"foreignKey:AuthorID" json:"author"`
+	LoanRecords []BookLoanInformation `gorm:"foreignKey:BookID" json:"loan_records"`
 }
 
-// Author represents an author entity
 type Author struct {
 	gorm.Model
 	Name  string `json:"name"`
-	Books []Book `gorm:"foreignkey:AuthorID" json:"books"` // One-to-many relationship
+	Email string `json:"email"`
+	Books []Book `gorm:"foreignKey:AuthorID" json:"books"`
 }
 
-// Borrow struct represents a borrowing transaction
-type Borrow struct {
+type Member struct {
 	gorm.Model
-	BorrowerName string       `json:"borrower_name"`
-	EmailAddress string       `json:"email_address"`
-	BorrowDate   string       `json:"borrow_date"`
-	ReturnDate   string       `json:"return_date"`
-	LoanedBooks  []LoanedBook `json:"loaned_books"` // One-to-many relationship with LoanedBook
+	Name         string                `json:"name"`
+	EmailAddress string                `json:"email_address"`
+	LoanRecords  []BookLoanInformation `gorm:"foreignKey:MemberID" json:"loan_records"`
 }
 
-// LoanedBook represents a specific book loaned in a borrow transaction
-type LoanedBook struct {
+type BookLoanInformation struct {
 	gorm.Model
-	BorrowID uint `json:"borrow_id"`                     // Foreign key to Borrow
-	BookID   uint `json:"book_id"`                       // Link to Book model
-	Book     Book `gorm:"foreignKey:BookID" json:"book"` // Book details
+	MemberID   uint   `json:"member_id"`
+	BookID     uint   `json:"book_id"`
+	BorrowDate string `json:"borrow_date"`
+	ReturnDate string `json:"return_date"`
+	Member     Member `gorm:"foreignKey:MemberID" json:"member"`
+	Book       Book   `gorm:"foreignKey:BookID" json:"book"`
 }
 
 func init() {
 	config.Connect()
 	db = config.GetDB()
-	db.AutoMigrate(&Book{}, &Author{}, &Borrow{}, &LoanedBook{}) // Automatically migrate the schema
+	db.AutoMigrate(&Book{}, &Author{}, &Member{}, &BookLoanInformation{}) // Automatically migrate the schema
 }
 
 func (b *Book) CreateBook() *Book {
@@ -106,20 +107,27 @@ func DeleteAuthor(ID int64) Author {
 	return author
 }
 
-// CreateBorrow creates a new borrow record with multiple books
-func (b *Borrow) CreateBorrow() *Borrow {
-	db.NewRecord(b)
-	db.Create(&b)
-	for _, loanedBook := range b.LoanedBooks {
-		loanedBook.BorrowID = b.ID // Auto-assign the borrow ID
-		db.Create(&loanedBook)     // Create a new LoanedBook for each book
-	}
-	return b
+func (m *Member) CreateMember() *Member {
+	db.NewRecord(m)
+	db.Create(&m)
+	return m
 }
 
-// GetAllBorrows retrieves all borrowing records with loaned books
-func GetAllBorrows() []Borrow {
-	var borrows []Borrow
-	db.Preload("LoanedBooks.Book").Find(&borrows) // Preload books for each borrow record
-	return borrows
+func GetMemberByID(Id int64) (*Member, *gorm.DB) {
+	var getMember Member
+	db := db.Where("ID=?", Id).Find(&getMember)
+	return &getMember, db
+}
+
+func (l *BookLoanInformation) CreateLoan() *BookLoanInformation {
+	db.NewRecord(l)
+	db.Create(&l)
+	return l
+}
+
+// Get all loan information by MemberID
+func GetLoansByMemberID(memberID uint) []BookLoanInformation {
+	var loans []BookLoanInformation
+	db.Where("member_id = ?", memberID).Preload("Member").Preload("Book").Find(&loans)
+	return loans
 }

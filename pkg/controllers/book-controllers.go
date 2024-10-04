@@ -47,7 +47,7 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 	done := make(chan bool)
 
 	// Use a Goroutine to send the notification asynchronously
-	go utils.SendNotification(b.Name, done)
+	go utils.SendNotification(b.Title, done)
 
 	// Respond to the client immediately
 	res, _ := json.Marshal(b)
@@ -88,17 +88,23 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	bookDetails, db := models.GetBookByID(ID)
-	if updateBook.Name != "" {
-		bookDetails.Name = updateBook.Name
+	if updateBook.Title != "" {
+		bookDetails.Title = updateBook.Title
 	}
 	if updateBook.ISBN != "" {
 		bookDetails.ISBN = updateBook.ISBN
 	}
-	if updateBook.NumberOfCopies != 0 {
-		bookDetails.NumberOfCopies = updateBook.NumberOfCopies
+	if updateBook.NumOfCopies != 0 {
+		bookDetails.NumOfCopies = updateBook.NumOfCopies
 	}
 	if updateBook.AuthorID != 0 {
 		bookDetails.AuthorID = updateBook.AuthorID
+	}
+	if updateBook.Year != 0 {
+		bookDetails.Year = updateBook.Year
+	}
+	if updateBook.Publication != "" {
+		bookDetails.Publication = updateBook.Publication
 	}
 	db.Save(&bookDetails)
 
@@ -171,21 +177,59 @@ func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
-// CreateBorrow handles the creation of a new borrow record with multiple books
-func CreateBorrow(w http.ResponseWriter, r *http.Request) {
-	borrow := &models.Borrow{}
-	utils.ParseBody(r, borrow) // Parse the request body
-	b := borrow.CreateBorrow() // Create a new borrow record
-	res, _ := json.Marshal(b)
+func CreateMember(w http.ResponseWriter, r *http.Request) {
+	var newMember models.Member
+	utils.ParseBody(r, &newMember)
+	member := newMember.CreateMember()
+
+	res, _ := json.Marshal(member)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
 
-// GetAllBorrows retrieves all borrow records with multiple books
-func GetAllBorrows(w http.ResponseWriter, r *http.Request) {
-	borrows := models.GetAllBorrows()
-	res, _ := json.Marshal(borrows)
+func GetMemberByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	memberId := vars["memberId"]
+
+	ID, err := strconv.ParseInt(memberId, 0, 0)
+	if err != nil {
+		fmt.Println("error while parsing")
+	}
+	memberDetails, _ := models.GetMemberByID(ID)
+	res, _ := json.Marshal(memberDetails)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
+
+func CreateBookLoanInformation(w http.ResponseWriter, r *http.Request) {
+	var newLoan models.BookLoanInformation
+	utils.ParseBody(r, &newLoan)
+
+	loan := newLoan.CreateLoan()
+
+	res, _ := json.Marshal(loan)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
+}
+
+func GetLoansForMember(w http.ResponseWriter, r *http.Request) {
+	// Get the memberID from the URL or request
+	vars := mux.Vars(r)
+	memberID, err := strconv.Atoi(vars["memberID"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Invalid member ID"))
+		return
+	}
+
+	// Fetch all loan records for this member
+	loans := models.GetLoansByMemberID(uint(memberID))
+
+	// Convert the result to JSON and send response
+	res, _ := json.Marshal(loans)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)

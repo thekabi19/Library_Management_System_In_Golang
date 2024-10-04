@@ -19,7 +19,13 @@ var RegisterBookStoreRoutes = func(router *mux.Router) {
 	router.HandleFunc("/author/{authorId}", controllers.DeleteAuthor).Methods("DELETE")
 	router.HandleFunc("/author/{authorId}/books", controllers.GetBooksByAuthor).Methods("GET")
 
-	// Borrow routes
-	router.HandleFunc("/borrow/", controllers.CreateBorrow).Methods("POST")
-	router.HandleFunc("/borrow/", controllers.GetAllBorrows).Methods("GET")
+	// Member routes
+	router.HandleFunc("/member/", controllers.CreateMember).Methods("POST")
+	router.HandleFunc("/member/{memberId}", controllers.GetMemberByID).Methods("GET")
+	//router.HandleFunc("/member/{memberId}", controllers.DeleteMember).Methods("DELETE")
+
+	// BookLoanInformation routes (Loan records)
+	router.HandleFunc("/member/{memberID}/loans", controllers.GetLoansForMember).Methods("GET")
+	router.HandleFunc("/loan/", controllers.CreateBookLoanInformation).Methods("POST")
+
 }
