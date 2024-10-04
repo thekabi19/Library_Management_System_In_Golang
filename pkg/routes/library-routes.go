@@ -14,7 +14,7 @@ var RegisterBookStoreRoutes = func(router *mux.Router) {
 
 	// Author routes
 	router.HandleFunc("/author/", controllers.CreateAuthor).Methods("POST")
-	router.HandleFunc("/author/", controllers.GetAuthor).Methods("GET")
+	router.HandleFunc("/author/", controllers.GetAllAuthors).Methods("GET")
 	router.HandleFunc("/author/{authorId}", controllers.GetAuthorByID).Methods("GET")
 	router.HandleFunc("/author/{authorId}", controllers.DeleteAuthor).Methods("DELETE")
 	router.HandleFunc("/author/{authorId}/books", controllers.GetBooksByAuthor).Methods("GET")
