@@ -6,9 +6,8 @@ import (
 
 type Member struct {
 	gorm.Model
-	Name         string                `json:"name"`
-	EmailAddress string                `json:"email_address"`
-	LoanRecords  []BookLoanInformation `gorm:"foreignKey:MemberID" json:"loan_records"`
+	Person
+	LoanRecords []BookLoanInformation `gorm:"foreignKey:MemberID" json:"loan_records"`
 }
 
 type BookLoanInformation struct {
@@ -21,21 +20,29 @@ type BookLoanInformation struct {
 	Book       Book   `gorm:"foreignKey:BookID" json:"book"`
 }
 
-/* GormAuthorManager implements ManageAuthors using GORM
-type GormMemberManager struct {
-	DB *gorm.DB
-}*/
-
-func (m *Member) CreateMember() *Member {
-	db.NewRecord(m)
-	db.Create(&m)
-	return m
+type MemberManager interface {
+	CreateMember(member *Member) *Member
+	GetMemberByID(memberID uint) (*Member, error)
 }
 
-func GetMemberByID(Id int64) (*Member, *gorm.DB) {
-	var getMember Member
-	db := db.Where("ID=?", Id).Find(&getMember)
-	return &getMember, db
+// GormAuthorManager implements ManageAuthors using GORM
+type GormMemberManager struct {
+	DB *gorm.DB
+}
+
+// Create a new author
+func (m *GormMemberManager) CreateMember(member *Member) *Member {
+	m.DB.Create(member)
+	return member
+}
+
+// Retrieves an member by their ID
+func (m *GormMemberManager) GetMemberByID(memberID uint) (*Member, error) {
+	var member Member
+	if err := m.DB.Preload("LoanRecords").Where("id = ?", memberID).Find(&member).Error; err != nil {
+		return nil, err
+	}
+	return &member, nil
 }
 
 func (l *BookLoanInformation) CreateLoan() *BookLoanInformation {

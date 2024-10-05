@@ -12,7 +12,7 @@ import (
 	"github.com/thekabi19/CSP3341_A2_code/pkg/utils"
 )
 
-var authorManager = &models.GormAuthorManager{DB: config.GetDB()} // Initialize GormBookManager
+var authorManager = &models.GormAuthorManager{DB: config.GetDB()} // Initialize GormAuthorManager
 
 // Get all books by an author
 func GetBooksByAuthor(w http.ResponseWriter, r *http.Request) {
