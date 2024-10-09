@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/thekabi19/CSP3341_A2_code/pkg/config"
@@ -43,6 +44,33 @@ func GetMemberByID(w http.ResponseWriter, r *http.Request) {
 func CreateBookLoanInformation(w http.ResponseWriter, r *http.Request) {
 	var newLoan models.BookLoanInformation
 	utils.ParseBody(r, &newLoan)
+
+	// Retrieve the book being requested for this loan transaction
+	book, _ := bookManager.GetBookByID(uint(newLoan.BookID))
+	if book == nil {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Book not found"))
+		return
+	}
+
+	// Check if there are copies available
+	if book.NumOfCopies <= 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("No copies of the book are available for borrowing"))
+		return
+	}
+
+	// lower the number of copies
+	book.NumOfCopies--
+
+	// Save the updated book information
+	bookManager.UpdateBook(uint(newLoan.BookID), book)
+
+	//Add the return time automatically (Sai, 2023)
+	now := time.Now()
+	newLoan.BorrowDate = now.Format("2006-01-02")
+	// Set the return date to 10 days after the borrow date
+	newLoan.ReturnDate = now.AddDate(0, 0, 10).Format("2006-01-02")
 
 	loan := newLoan.CreateLoan()
 
