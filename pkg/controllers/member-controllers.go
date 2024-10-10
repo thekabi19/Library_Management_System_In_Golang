@@ -41,30 +41,39 @@ func GetMemberByID(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
-func CreateBookLoanInformation(w http.ResponseWriter, r *http.Request) {
-	var newLoan models.BookLoanInformation
+func CreateLoanInformation(w http.ResponseWriter, r *http.Request) {
+	var newLoan models.LoanInformation
 	utils.ParseBody(r, &newLoan)
 
-	// Retrieve the book being requested for this loan transaction
-	book, _ := bookManager.GetBookByID(uint(newLoan.BookID))
-	if book == nil {
+	// Determine if it's a book or magazine
+	var loanable models.Loanable
+	if newLoan.LoanableType == "book" {
+		loanable, _ = bookManager.GetBookByID(newLoan.LoanableID)
+	} else if newLoan.LoanableType == "magazine" {
+		loanable, _ = magazineManager.GetMagazineByID(newLoan.LoanableID)
+	}
+
+	if loanable == nil {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("Book not found"))
+		w.Write([]byte("Item not found"))
 		return
 	}
 
 	// Check if there are copies available
-	if book.NumOfCopies <= 0 {
+	if loanable.GetNumOfCopies() <= 0 {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("No copies of the book are available for borrowing"))
+		w.Write([]byte("No copies available for borrowing"))
 		return
 	}
+	// Decrement the number of available copies
+	loanable.DecrementCopies()
 
-	// lower the number of copies
-	book.NumOfCopies--
-
-	// Save the updated book information
-	bookManager.UpdateBook(uint(newLoan.BookID), book)
+	// Save the changes back to the database based on type
+	if newLoan.LoanableType == "book" {
+		bookManager.UpdateBook(newLoan.LoanableID, loanable.(*models.Book)) // Cast to *models.Book
+	} else if newLoan.LoanableType == "magazine" {
+		magazineManager.UpdateMagazine(newLoan.LoanableID, loanable.(*models.Magazine)) // Cast to *models.Magazine
+	}
 
 	//Add the return time automatically (Sai, 2023)
 	now := time.Now()
@@ -72,7 +81,7 @@ func CreateBookLoanInformation(w http.ResponseWriter, r *http.Request) {
 	// Set the return date to 10 days after the borrow date
 	newLoan.ReturnDate = now.AddDate(0, 0, 10).Format("2006-01-02")
 
-	loan := newLoan.CreateLoan()
+	loan := newLoan.CreateLoan(loanable)
 
 	res, _ := json.Marshal(loan)
 	w.Header().Set("Content-Type", "application/json")
@@ -91,7 +100,7 @@ func GetLoansForMember(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Fetch all loan records for this member
-	loans := models.GetLoansByMemberID(uint(memberID))
+	loans := models.GetLoansByID(uint(memberID))
 
 	// Convert the result to JSON and send response
 	res, _ := json.Marshal(loans)

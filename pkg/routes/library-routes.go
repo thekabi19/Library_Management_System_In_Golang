@@ -6,11 +6,17 @@ import (
 )
 
 var RegisterBookStoreRoutes = func(router *mux.Router) {
+	// Book routes
 	router.HandleFunc("/book/", controllers.CreateBook).Methods("POST")
 	router.HandleFunc("/book/", controllers.GetBook).Methods("GET")
 	router.HandleFunc("/book/{bookId}", controllers.GetBookByID).Methods("GET")
 	router.HandleFunc("/book/{bookId}", controllers.UpdateBook).Methods("PUT")
 	router.HandleFunc("/book/{bookId}", controllers.DeleteBook).Methods("DELETE")
+
+	// magazine routes
+	router.HandleFunc("/magazine/", controllers.CreateMagazine).Methods("POST")
+	router.HandleFunc("/magazine/", controllers.GetAllMagazines).Methods("GET")
+	router.HandleFunc("/magazine/{magazineId}", controllers.GetMagazineByID).Methods("GET")
 
 	// Author routes
 	router.HandleFunc("/author/", controllers.CreateAuthor).Methods("POST")
@@ -26,6 +32,6 @@ var RegisterBookStoreRoutes = func(router *mux.Router) {
 
 	// BookLoanInformation routes (Loan records)
 	router.HandleFunc("/member/{memberID}/loans", controllers.GetLoansForMember).Methods("GET")
-	router.HandleFunc("/loan/", controllers.CreateBookLoanInformation).Methods("POST")
+	router.HandleFunc("/loan/", controllers.CreateLoanInformation).Methods("POST")
 
 }
