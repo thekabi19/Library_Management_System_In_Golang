@@ -11,6 +11,7 @@ import (
 	"github.com/thekabi19/CSP3341_A2_code/pkg/utils"
 )
 
+// Create new loan
 func CreateLoanInformation(w http.ResponseWriter, r *http.Request) {
 	var newLoan models.LoanInformation
 	utils.ParseBody(r, &newLoan)
@@ -18,11 +19,11 @@ func CreateLoanInformation(w http.ResponseWriter, r *http.Request) {
 	// Determine if it's a book or magazine
 	var loanable models.Loanable
 	if newLoan.LoanableType == "book" {
-		loanable, _ = bookManager.GetBookByID(newLoan.LoanableID)
+		loanable, _ = bookManager.GetBookByID(newLoan.LoanableID) //get the item ID from their appropriate methods
 	} else if newLoan.LoanableType == "magazine" {
-		loanable, _ = magazineManager.GetMagazineByID(newLoan.LoanableID)
+		loanable, _ = magazineManager.GetMagazineByID(newLoan.LoanableID) //get the item ID from their appropriate methods
 	}
-
+	//Error handling incase of wrong Item ID is entered
 	if loanable == nil {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("Item not found"))
@@ -35,7 +36,7 @@ func CreateLoanInformation(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("No copies available for borrowing"))
 		return
 	}
-	// Decrement the number of available copies
+	// Decrement the number of available copies using the polymorphic method
 	loanable.DecrementCopies()
 
 	// Save the changes back to the database based on type

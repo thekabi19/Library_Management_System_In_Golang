@@ -13,8 +13,9 @@ import (
 	"golang.org/x/exp/rand"
 )
 
-var memberManager = &models.GormMemberManager{DB: config.GetDB()} // Initialize GormMemberManager
+var memberManager = &models.MemberManager{DB: config.GetDB()} // Initialize MemberManager
 
+// Create a new member and save it to database
 func CreateMember(w http.ResponseWriter, r *http.Request) {
 	newMember := &models.Member{}
 	utils.ParseBody(r, &newMember)
@@ -26,6 +27,7 @@ func CreateMember(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
+// Get member by their ID
 func GetMemberByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	memberId := vars["memberId"]
@@ -41,6 +43,7 @@ func GetMemberByID(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
+// Automatically calculate the member outdated fees
 func GetMemberFees(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	memberId := vars["memberId"]
@@ -58,13 +61,13 @@ func GetMemberFees(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Generate random number with 30
+	// Generate random number with 30 (shivamraj, 2020)
 	overdueDays := rand.Intn(30)
 
 	// Calculate total amount with penalties
 	totalAmount := memberDetails.CalculateTotalAmount(overdueDays)
 
-	// Prepare the response with fees breakdown
+	// Prepare the response with fees breakdown using map interface (Rindi, 2023)
 	response := map[string]interface{}{
 		"member":        memberDetails,
 		"outdated_fees": memberDetails.OutdatedFees,

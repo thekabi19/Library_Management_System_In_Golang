@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// Magazine datatype
 type Magazine struct {
 	gorm.Model
 	Title       string `json:"title"`
@@ -13,33 +14,34 @@ type Magazine struct {
 	Year        int    `json:"year"`
 }
 
-type MagazineManager interface {
+// Interface implementing the magazine method signatures
+type ManageMagazines interface {
 	CreateMagazine(magazine *Magazine) *Magazine
 	GetAllMagazines() []Magazine
 	GetMagazineByID(magazineID uint) (*Magazine, error)
 	UpdateMagazine(magazineID uint, magazine *Magazine)
 }
 
-// GormMagazineManager implements ManageAuthors using GORM
-type GormMagazineManager struct {
+// MagazineManager implements ManageAuthors for abstraction
+type MagazineManager struct {
 	DB *gorm.DB
 }
 
-// Create a new author
-func (am *GormMagazineManager) CreateMagazine(magazine *Magazine) *Magazine {
+// Create a new magazine
+func (am *MagazineManager) CreateMagazine(magazine *Magazine) *Magazine {
 	am.DB.Create(magazine)
 	return magazine
 }
 
-// Retrieves all authors from the database
-func (am *GormMagazineManager) GetAllMagazines() []Magazine {
+// Retrieves all magazine from the database
+func (am *MagazineManager) GetAllMagazines() []Magazine {
 	var magazines []Magazine
 	am.DB.Find(&magazines)
 	return magazines
 }
 
-// Retrieves a Magazine by their ID
-func (am *GormMagazineManager) GetMagazineByID(magazineID uint) (*Magazine, error) {
+// Retrieves a Magazine by its ID
+func (am *MagazineManager) GetMagazineByID(magazineID uint) (*Magazine, error) {
 	var magazine Magazine
 	if err := db.Where("id = ?", magazineID).Find(&magazine).Error; err != nil {
 		return nil, err
@@ -47,12 +49,13 @@ func (am *GormMagazineManager) GetMagazineByID(magazineID uint) (*Magazine, erro
 	return &magazine, nil
 }
 
-// UpdateBook updates an existing book in the database
-func (am *GormMagazineManager) UpdateMagazine(magazineID uint, magazine *Magazine) {
+// updates an existing magazine in the database
+func (am *MagazineManager) UpdateMagazine(magazineID uint, magazine *Magazine) {
 	magazine.ID = magazineID
 	am.DB.Save(magazine)
 }
 
+// Polymorphic methods implemented similar to book
 func (m *Magazine) GetID() uint {
 	return m.ID
 }

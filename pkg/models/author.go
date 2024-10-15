@@ -17,15 +17,16 @@ type Author struct {
 	Books []Book `gorm:"foreignKey:AuthorID" json:"books"`
 }
 
-type AuthorManager interface {
+// Interface with author methods to implement abstraction
+type ManageAuthors interface {
 	CreateAuthor(author *Author) *Author
 	GetAllAuthors() []Author
 	GetAuthorByID(authorID uint) (*Author, error)
 	DeleteAuthor(authorID uint) *Author
 }
 
-// GormAuthorManager implements ManageAuthors using GORM
-type GormAuthorManager struct {
+// AuthorManager implements ManageAuthors for abstraction
+type AuthorManager struct {
 	DB *gorm.DB
 }
 
@@ -37,20 +38,20 @@ func GetBooksByAuthor(authorId uint) []Book {
 }
 
 // Create a new author
-func (am *GormAuthorManager) CreateAuthor(author *Author) *Author {
+func (am *AuthorManager) CreateAuthor(author *Author) *Author {
 	am.DB.Create(author)
 	return author
 }
 
 // Retrieves all authors from the database
-func (am *GormAuthorManager) GetAllAuthors() []Author {
+func (am *AuthorManager) GetAllAuthors() []Author {
 	var authors []Author
 	am.DB.Find(&authors)
 	return authors
 }
 
 // Retrieves an author by their ID
-func (am *GormAuthorManager) GetAuthorByID(authorID uint) (*Author, error) {
+func (am *AuthorManager) GetAuthorByID(authorID uint) (*Author, error) {
 	var author Author
 	if err := am.DB.Preload("Books").Where("id = ?", authorID).Find(&author).Error; err != nil {
 		return nil, err
@@ -59,7 +60,7 @@ func (am *GormAuthorManager) GetAuthorByID(authorID uint) (*Author, error) {
 }
 
 // Removes an author from the database by their ID
-func (am *GormAuthorManager) DeleteAuthor(authorID uint) *Author {
+func (am *AuthorManager) DeleteAuthor(authorID uint) *Author {
 	var author Author
 	am.DB.Where("id = ?", authorID).Delete(&author)
 	return &author

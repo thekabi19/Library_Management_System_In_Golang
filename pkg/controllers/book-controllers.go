@@ -12,8 +12,9 @@ import (
 	"github.com/thekabi19/CSP3341_A2_code/pkg/utils"
 )
 
-var NewBook models.Book
+var NewBook models.Book //loads a new instance of Book
 
+// Implements GetAll book to API
 func GetBook(w http.ResponseWriter, r *http.Request) {
 	newBooks := models.GetAllBooks()
 	res, _ := json.Marshal(newBooks)
@@ -22,14 +23,14 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
-var bookManager = &models.GormBookManager{DB: config.GetDB()} // Initialize GormBookManager
+var bookManager = &models.BookManager{DB: config.GetDB()} // Initialize BookManager
 
 // GetBookByID retrieves a book by its ID
 func GetBookByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r) // Access the book ID in the request body
 	bookId := vars["bookId"]
 
-	ID, err := strconv.ParseUint(bookId, 10, 0)
+	ID, err := strconv.ParseUint(bookId, 10, 0) //converts to uint with base size 10 and bitsize 0
 	if err != nil {
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 		return
@@ -42,7 +43,7 @@ func GetBookByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res, _ := json.Marshal(bookDetails)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "pkglicapkglication/jsontion/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
@@ -53,19 +54,19 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 	utils.ParseBody(r, newBook)
 	bookManager.CreateBook(newBook) // Use the interface method
 
-	// Create a channel to communicate the completion of the Goroutine
+	//channel communicates the completion of the sendNotifiction goroutine
 	done := make(chan bool)
 
-	// Use a Goroutine to send the notification asynchronously
+	//Goroutine is used to send the notification asynchronously
 	go utils.SendNotification(newBook.Title, done)
 
 	// Respond to the client immediately
 	res, _ := json.Marshal(newBook)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 
-	// Wait for the notification Goroutine to finish (optional)
+	// Wait for the notification Goroutine to finish
 	go func() {
 		<-done // Wait for the signal that the Goroutine has finished
 		fmt.Println("Notification process completed.")
@@ -76,7 +77,7 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	bookId := vars["bookId"]
-	ID, err := strconv.ParseUint(bookId, 10, 0)
+	ID, err := strconv.ParseUint(bookId, 10, 0) //converts to uint with base size 10 and bitsize 0
 	if err != nil {
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 		return
@@ -87,12 +88,13 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent) // No content returned on delete
 }
 
+// Updates the book by ID and the changes field
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	var updateBook = &models.Book{}
 	utils.ParseBody(r, updateBook)
 	vars := mux.Vars(r)
 	bookId := vars["bookId"]
-	ID, err := strconv.ParseInt(bookId, 0, 0)
+	ID, err := strconv.ParseInt(bookId, 0, 0) //converts to uint with base size 0 and bitsize 0
 	if err != nil {
 		fmt.Println("error while parsing")
 	}
@@ -102,6 +104,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Book not found", http.StatusNotFound)
 		return
 	}
+	//Checks whether the updateBook field are not empty
 	if updateBook.Title != "" {
 		bookDetails.Title = updateBook.Title
 	}
@@ -120,10 +123,10 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	if updateBook.Publication != "" {
 		bookDetails.Publication = updateBook.Publication
 	}
-	bookManager.UpdateBook(uint(ID), bookDetails) // Use the interface method
+	bookManager.UpdateBook(uint(ID), bookDetails) // Use the interface method to update the book with changed fields
 
 	res, _ := json.Marshal(bookDetails)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }

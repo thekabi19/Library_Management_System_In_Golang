@@ -12,8 +12,9 @@ import (
 	"github.com/thekabi19/CSP3341_A2_code/pkg/utils"
 )
 
-var magazineManager = &models.GormMagazineManager{DB: config.GetDB()} // Initialize GormAuthorManager
+var magazineManager = &models.MagazineManager{DB: config.GetDB()} // Initialize MagazineManager
 
+// Get All magazines from database
 func GetAllMagazines(w http.ResponseWriter, r *http.Request) {
 	magazines := magazineManager.GetAllMagazines()
 	res, _ := json.Marshal(magazines)
@@ -22,11 +23,12 @@ func GetAllMagazines(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
+// Get magazine by ID
 func GetMagazineByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	magazineId := vars["magazineId"]
 
-	ID, err := strconv.ParseInt(magazineId, 0, 0)
+	ID, err := strconv.ParseInt(magazineId, 10, 32)
 	if err != nil {
 		fmt.Println("error while parsing")
 	}
@@ -38,6 +40,7 @@ func GetMagazineByID(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
+// Create a new magazine
 func CreateMagazine(w http.ResponseWriter, r *http.Request) {
 	magazine := &models.Magazine{}
 	utils.ParseBody(r, magazine)
@@ -48,6 +51,7 @@ func CreateMagazine(w http.ResponseWriter, r *http.Request) {
 	w.Write(res)
 }
 
+// Update magazine similarly to book
 func UpdateMagazine(w http.ResponseWriter, r *http.Request) {
 	var updateMagazine = &models.Magazine{}
 	utils.ParseBody(r, updateMagazine)

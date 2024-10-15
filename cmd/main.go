@@ -12,7 +12,7 @@ import (
 
 func main() {
 	r := mux.NewRouter()
-	routes.RegisterBookStoreRoutes(r)
+	routes.RegisterBookStoreRoutes(r) //intialize all the api routes
 	http.Handle("/", r)
-	log.Fatal(http.ListenAndServe("localhost:9010", r))
+	log.Fatal(http.ListenAndServe("localhost:9010", r)) //Set the port number of the API endpoint
 }

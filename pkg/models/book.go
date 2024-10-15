@@ -9,7 +9,7 @@ import (
 
 var db *gorm.DB
 
-// Loanable interface defines methods that any loanable item should implement
+// Loanable interface has method signatures common for any loanble items such as the book and magazine
 type Loanable interface {
 	GetID() uint
 	GetTitle() string
@@ -17,6 +17,7 @@ type Loanable interface {
 	DecrementCopies()
 }
 
+// Book Struct defines the Book datatype
 type Book struct {
 	gorm.Model
 	Title       string `json:"title"`
@@ -39,10 +40,12 @@ type ManageBooks interface {
 
 var ErrBookNotFound = errors.New("Book with the entered ID not found")
 
-type GormBookManager struct {
-	DB *gorm.DB // Changed from 'db' to 'DB' to make it exported
+// A book manager struct with pointer to the mysql database object
+type BookManager struct {
+	DB *gorm.DB
 }
 
+// Intializes the tables in the library database
 func init() {
 	config.Connect()
 	db = config.GetDB()
@@ -50,10 +53,11 @@ func init() {
 }
 
 // AddBook adds a new book to the database
-func (bm *GormBookManager) CreateBook(book *Book) {
+func (bm *BookManager) CreateBook(book *Book) {
 	bm.DB.Create(book)
 }
 
+// GetAllBooks get all books from the database
 func GetAllBooks() []Book {
 	var Books []Book
 	db.Preload("Author").Find(&Books)
@@ -61,16 +65,16 @@ func GetAllBooks() []Book {
 }
 
 // UpdateBook updates an existing book in the database
-func (bm *GormBookManager) UpdateBook(bookID uint, book *Book) {
+func (bm *BookManager) UpdateBook(bookID uint, book *Book) {
 	book.ID = bookID
 	bm.DB.Save(book)
 }
 
-// GetBookByID retrieves a book by its ID
-func (bm *GormBookManager) GetBookByID(bookID uint) (*Book, error) {
+// GetBookByID retrieves a book by its bookID
+func (bm *BookManager) GetBookByID(bookID uint) (*Book, error) {
 	var book Book
-	bookFound := bm.DB.Where("id = ?", bookID).Preload("Author").Find(&book)
-
+	bookFound := bm.DB.Where("id = ?", bookID).Preload("Author").Find(&book) //preload author as we need the authur also for the book
+	//Error checking if the book is found or not
 	if bookFound.RowsAffected == 0 {
 		return nil, ErrBookNotFound
 	} else if bookFound.Error != nil {
@@ -81,10 +85,11 @@ func (bm *GormBookManager) GetBookByID(bookID uint) (*Book, error) {
 }
 
 // DeleteBook removes a book from the database by its ID
-func (bm *GormBookManager) DeleteBook(bookID uint) {
+func (bm *BookManager) DeleteBook(bookID uint) {
 	bm.DB.Delete(&Book{}, bookID)
 }
 
+// Polymorphic methods for book
 func (b *Book) GetID() uint {
 	return b.ID
 }

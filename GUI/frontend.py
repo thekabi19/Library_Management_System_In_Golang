@@ -2,7 +2,8 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 import requests
 
-# Function stubs (Replace with actual API calls)
+#This basic python GUI was made using Bansal (2024) and HTTP requests by Ronquillo (2024)
+# Function stubs 
 def add_book():
     book_data = {
         "title": entry_book_title.get(),
@@ -12,7 +13,7 @@ def add_book():
         "publication": entry_book_publication.get(),
         "num_of_copies": int(entry_book_num_of_copies.get())
     }
-    response = requests.post('http://localhost:9010/book/', json=book_data)
+    response = requests.post('http://localhost:9010/book/', json=book_data) 
     text_books.insert(tk.END, f"Book added: {response.json()}\n")
 
 def get_book_by_id():
@@ -177,23 +178,7 @@ def create_loan():
     }
     response = requests.post('http://localhost:9010/loan/', json=loan_data)
     text_loans.insert(tk.END, f"Loan created: {response.json()}\n")
-'''
-def get_all_loans():
-    response = requests.get('http://localhost:9010/loan/')
-    loans = response.json()
-    text_loans.delete('1.0', tk.END)  # Clear previous content
-    for loan in loans:
-        formatted_loan = (
-            f"Loan ID: {loan['id']}\n"
-            f"Member ID: {loan['member_id']}\n"
-            f"Loanable ID: {loan['loanable_id']}\n"
-            f"Loanable Type: {loan['loanable_type']}\n"
-            f"Borrow Date: {loan['borrow_date']}\n"
-            f"Return Date: {loan['return_date']}\n"
-            "----------------------\n"
-        )
-        text_loans.insert(tk.END, formatted_loan)
-'''
+
 # Main application window
 app = tk.Tk()
 app.title("Library Management System")
@@ -204,156 +189,156 @@ notebook.pack(expand=True, fill='both')
 # Book Tab
 tab_books = ttk.Frame(notebook)
 notebook.add(tab_books, text="Books")
-
+#create the book title entry label
 tk.Label(tab_books, text="Title:").grid(row=0, column=0)
 entry_book_title = tk.Entry(tab_books)
 entry_book_title.grid(row=0, column=1)
-
+#create the book year entry label
 tk.Label(tab_books, text="Year:").grid(row=1, column=0)
 entry_book_year = tk.Entry(tab_books)
 entry_book_year.grid(row=1, column=1)
-
+#create the book authorID entry label
 tk.Label(tab_books, text="Author ID:").grid(row=2, column=0)
 entry_book_author_id = tk.Entry(tab_books)
 entry_book_author_id.grid(row=2, column=1)
-
+#create the book ISBN entry label
 tk.Label(tab_books, text="ISBN:").grid(row=3, column=0)
 entry_book_isbn = tk.Entry(tab_books)
 entry_book_isbn.grid(row=3, column=1)
-
+#create the book publication entry label
 tk.Label(tab_books, text="Publication:").grid(row=4, column=0)
 entry_book_publication = tk.Entry(tab_books)
 entry_book_publication.grid(row=4, column=1)
-
+#create the book numberofcopies entry label
 tk.Label(tab_books, text="Num of Copies:").grid(row=5, column=0)
 entry_book_num_of_copies = tk.Entry(tab_books)
 entry_book_num_of_copies.grid(row=5, column=1)
 
-tk.Button(tab_books, text="Add Book", command=add_book).grid(row=6, column=0)
-tk.Button(tab_books, text="Get All Books", command=get_all_books).grid(row=6, column=1)
+tk.Button(tab_books, text="Add Book", command=add_book).grid(row=6, column=0) #add book button
+tk.Button(tab_books, text="Get All Books", command=get_all_books).grid(row=6, column=1) #get all books button
 
 # Book ID for search/delete
 tk.Label(tab_books, text="Book ID:").grid(row=7, column=0)
 entry_get_book_id = tk.Entry(tab_books)
 entry_get_book_id.grid(row=7, column=1)
-tk.Button(tab_books, text="Get Book", command=get_book_by_id).grid(row=8, column=0)
-tk.Button(tab_books, text="Delete Book", command=delete_book).grid(row=8, column=1)
-
-text_books = scrolledtext.ScrolledText(tab_books, width=50, height=10)
+tk.Button(tab_books, text="Get Book", command=get_book_by_id).grid(row=8, column=0) #Get book by ID button
+tk.Button(tab_books, text="Delete Book", command=delete_book).grid(row=8, column=1) #Delete book button
+#A text box with scroll bar to show the output
+text_books = scrolledtext.ScrolledText(tab_books, width=50, height=10) 
 text_books.grid(row=9, column=0, columnspan=2)
 
 # Author Tab
 tab_authors = ttk.Frame(notebook)
 notebook.add(tab_authors, text="Authors")
-
+#create the author name entry label
 tk.Label(tab_authors, text="Name:").grid(row=0, column=0)
 entry_author_name = tk.Entry(tab_authors)
 entry_author_name.grid(row=0, column=1)
-
+#create the author email entry label
 tk.Label(tab_authors, text="Email:").grid(row=1, column=0)
 entry_author_email = tk.Entry(tab_authors)
 entry_author_email.grid(row=1, column=1)
 
-tk.Button(tab_authors, text="Add Author", command=add_author).grid(row=2, column=0)
-tk.Button(tab_authors, text="Get All Authors", command=get_all_authors).grid(row=2, column=1)
+tk.Button(tab_authors, text="Add Author", command=add_author).grid(row=2, column=0) #add author button
+tk.Button(tab_authors, text="Get All Authors", command=get_all_authors).grid(row=2, column=1) #get all button
 
 # Author ID for search/delete
 tk.Label(tab_authors, text="Author ID:").grid(row=3, column=0)
 entry_get_author_id = tk.Entry(tab_authors)
 entry_get_author_id.grid(row=3, column=1)
-tk.Button(tab_authors, text="Get Author", command=get_author_by_id).grid(row=4, column=0)
-tk.Button(tab_authors, text="Delete Author", command=delete_author).grid(row=4, column=1)
-
+tk.Button(tab_authors, text="Get Author", command=get_author_by_id).grid(row=4, column=0) #get author by ID button
+tk.Button(tab_authors, text="Delete Author", command=delete_author).grid(row=4, column=1) #delete author by ID button
+#A text box with scroll bar to show the output
 text_authors = scrolledtext.ScrolledText(tab_authors, width=50, height=10)
 text_authors.grid(row=5, column=0, columnspan=2)
 
 # Magazine Tab
 tab_magazines = ttk.Frame(notebook)
 notebook.add(tab_magazines, text="Magazines")
-
+#create the magazine title entry label
 tk.Label(tab_magazines, text="Title:").grid(row=0, column=0)
 entry_magazine_title = tk.Entry(tab_magazines)
 entry_magazine_title.grid(row=0, column=1)
-
+#create the magazine issue number entry label
 tk.Label(tab_magazines, text="Issue Number:").grid(row=1, column=0)
 entry_magazine_issue = tk.Entry(tab_magazines)
 entry_magazine_issue.grid(row=1, column=1)
-
+#create the magazine numofcopies entry label
 tk.Label(tab_magazines, text="Num of Copies:").grid(row=2, column=0)
 entry_magazine_copies = tk.Entry(tab_magazines)
 entry_magazine_copies.grid(row=2, column=1)
-
+#create the magazine publishers entry label
 tk.Label(tab_magazines, text="Publisher:").grid(row=3, column=0)
 entry_magazine_publisher = tk.Entry(tab_magazines)
 entry_magazine_publisher.grid(row=3, column=1)
-
+#create the magazine year entry label
 tk.Label(tab_magazines, text="Year:").grid(row=4, column=0)
 entry_magazine_year = tk.Entry(tab_magazines)
 entry_magazine_year.grid(row=4, column=1)
 
-tk.Button(tab_magazines, text="Add Magazine", command=add_magazine).grid(row=5, column=0)
-tk.Button(tab_magazines, text="Get All Magazines", command=get_all_magazines).grid(row=5, column=1)
+tk.Button(tab_magazines, text="Add Magazine", command=add_magazine).grid(row=5, column=0) #add magazine button
+tk.Button(tab_magazines, text="Get All Magazines", command=get_all_magazines).grid(row=5, column=1) #add get all magazines button
 
 # Magazine ID for search/delete
 tk.Label(tab_magazines, text="Magazine ID:").grid(row=6, column=0)
 entry_get_magazine_id = tk.Entry(tab_magazines)
 entry_get_magazine_id.grid(row=6, column=1)
-tk.Button(tab_magazines, text="Get Magazine", command=get_magazine_by_id).grid(row=7, column=0)
-tk.Button(tab_magazines, text="Delete Magazine", command=delete_magazine).grid(row=7, column=1)
-
+tk.Button(tab_magazines, text="Get Magazine", command=get_magazine_by_id).grid(row=7, column=0) #get magazine by ID button
+tk.Button(tab_magazines, text="Delete Magazine", command=delete_magazine).grid(row=7, column=1)#delete magazine button
+#Text box with scroll bar for output
 text_magazines = scrolledtext.ScrolledText(tab_magazines, width=50, height=10)
 text_magazines.grid(row=8, column=0, columnspan=2)
 
 # Member Tab
 tab_members = ttk.Frame(notebook)
 notebook.add(tab_members, text="Members")
-
+#create the member name entry label
 tk.Label(tab_members, text="Name:").grid(row=0, column=0)
 entry_member_name = tk.Entry(tab_members)
 entry_member_name.grid(row=0, column=1)
-
+#create the member email entry label
 tk.Label(tab_members, text="Email:").grid(row=1, column=0)
 entry_member_email = tk.Entry(tab_members)
 entry_member_email.grid(row=1, column=1)
-
+#create the member outdated fees entry label
 tk.Label(tab_members, text="Outdated Fees:").grid(row=2, column=0)
 entry_member_outdatedFees = tk.Entry(tab_members)
 entry_member_outdatedFees.grid(row=2, column=1)
 
-tk.Button(tab_members, text="Create Member", command=create_member).grid(row=3, column=0)
+tk.Button(tab_members, text="Create Member", command=create_member).grid(row=3, column=0) #create member button
 
 # Member ID for searching loans
 tk.Label(tab_members, text="Member ID:").grid(row=4, column=0)
 entry_get_member_id = tk.Entry(tab_members)
 entry_get_member_id.grid(row=4, column=1)
-tk.Button(tab_members, text="Get Member Loans", command=get_loans_by_member_id).grid(row=5, column=0)
+tk.Button(tab_members, text="Get Member Loans", command=get_loans_by_member_id).grid(row=5, column=0) #get loans by member ID
 
 # Button to fetch member fees
 button_get_member_fees = ttk.Button(tab_members, text="Get Member Fees", command=get_member_fees)
 button_get_member_fees.grid(row=5, column=1, columnspan=2)
-
+#Text box with scroll bar for output
 text_members = scrolledtext.ScrolledText(tab_members, width=50, height=10)
 text_members.grid(row=6, column=0, columnspan=2)
 
 # Loan Tab
 tab_loans = ttk.Frame(notebook)
 notebook.add(tab_loans, text="Loans")
-
+#create the member ID entry label for loan
 tk.Label(tab_loans, text="Member ID:").grid(row=0, column=0)
 entry_loan_member_id = tk.Entry(tab_loans)
 entry_loan_member_id.grid(row=0, column=1)
-
+#create the loanable ID entry label for loan
 tk.Label(tab_loans, text="Loanable ID:").grid(row=1, column=0)
 entry_loan_loanable_id = tk.Entry(tab_loans)
 entry_loan_loanable_id.grid(row=1, column=1)
-
+#create the loanable type entry label for loan
 tk.Label(tab_loans, text="Type (book/magazine):").grid(row=2, column=0)
 entry_loan_type = tk.Entry(tab_loans)
 entry_loan_type.grid(row=2, column=1)
 
-tk.Button(tab_loans, text="Create Loan", command=create_loan).grid(row=3, column=0)
+tk.Button(tab_loans, text="Create Loan", command=create_loan).grid(row=3, column=0) #create loan button
 #tk.Button(tab_loans, text="Get All Loans", command=get_all_loans).grid(row=3, column=1)
-
+#Text box with scroll bar for output
 text_loans = scrolledtext.ScrolledText(tab_loans, width=50, height=10)
 text_loans.grid(row=4, column=0, columnspan=2)
 
