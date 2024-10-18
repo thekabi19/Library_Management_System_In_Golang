@@ -18,7 +18,7 @@ var magazineManager = &models.MagazineManager{DB: config.GetDB()} // Initialize 
 func GetAllMagazines(w http.ResponseWriter, r *http.Request) {
 	magazines := magazineManager.GetAllMagazines()
 	res, _ := json.Marshal(magazines)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
@@ -35,7 +35,7 @@ func GetMagazineByID(w http.ResponseWriter, r *http.Request) {
 
 	magazine, _ := magazineManager.GetMagazineByID(uint(ID))
 	res, _ := json.Marshal(magazine)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
@@ -46,7 +46,7 @@ func CreateMagazine(w http.ResponseWriter, r *http.Request) {
 	utils.ParseBody(r, magazine)
 	createdMagazine := magazineManager.CreateMagazine(magazine)
 	res, _ := json.Marshal(createdMagazine)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
@@ -85,7 +85,7 @@ func UpdateMagazine(w http.ResponseWriter, r *http.Request) {
 	magazineManager.UpdateMagazine(uint(ID), magazineDetails) // Use the interface method
 
 	res, _ := json.Marshal(magazineDetails)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }

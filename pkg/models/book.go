@@ -27,7 +27,6 @@ type Book struct {
 	Publication string `json:"publication"`
 	NumOfCopies int    `json:"num_of_copies"`
 	Author      Author `gorm:"foreignKey:AuthorID" json:"author"`
-	//LoanRecords []BookLoanInformation `gorm:"foreignKey:BookID" json:"loan_records"`
 }
 
 // ManageBooks interface for managing book-related operations

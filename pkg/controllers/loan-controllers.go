@@ -55,7 +55,7 @@ func CreateLoanInformation(w http.ResponseWriter, r *http.Request) {
 	loan := newLoan.CreateLoan(loanable)
 
 	res, _ := json.Marshal(loan)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
@@ -75,7 +75,7 @@ func GetLoansForMember(w http.ResponseWriter, r *http.Request) {
 
 	// Convert the result to JSON and send response
 	res, _ := json.Marshal(loans)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }

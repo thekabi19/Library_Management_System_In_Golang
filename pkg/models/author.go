@@ -53,7 +53,7 @@ func (am *AuthorManager) GetAllAuthors() []Author {
 // Retrieves an author by their ID
 func (am *AuthorManager) GetAuthorByID(authorID uint) (*Author, error) {
 	var author Author
-	if err := am.DB.Preload("Books").Where("id = ?", authorID).Find(&author).Error; err != nil {
+	if err := am.DB.Where("id = ?", authorID).Find(&author).Error; err != nil {
 		return nil, err
 	}
 	return &author, nil
